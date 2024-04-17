@@ -1,4 +1,6 @@
 node_modules
+coverage/
+coverage/lcov-report/
 
 # config
 .vscode

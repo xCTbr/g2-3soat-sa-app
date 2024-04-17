@@ -1,6 +1,4 @@
 node_modules
-coverage/
-coverage/lcov-report/
 
 # config
 .vscode
@@ -8,3 +6,8 @@ coverage/lcov-report/
 # secrets
 .env_local
 .env.local
+
+# testing
+coverage/
+coverage/lcov-report/
+coverage/clover.xml

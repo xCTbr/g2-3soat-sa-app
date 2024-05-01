@@ -51,7 +51,6 @@ export default function categoryController() {
   const updateCategoryById = (req, res, next) => {
     const {categoryName, description} = req.body;
 
-    // console.log('controller update by id->',dbRepository);
     useCaseUpdateById(
       req.params.id,
       categoryName,
@@ -62,7 +61,7 @@ export default function categoryController() {
       .catch((error) => next(error));
       
   };
-  //console.log('Controller final',dbRepository);
+  
   return {
 		addNewCategory,
     fetchAllCategory,

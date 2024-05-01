@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest --coverage --passWithNoTests",
+    "test": "jest --coverage --detectOpenHandles",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:coverage": "jest --watch --coverage --passWithNoTests",
     "dev": "nodemon server.js",
     "doc": "node swagger.js"
   },

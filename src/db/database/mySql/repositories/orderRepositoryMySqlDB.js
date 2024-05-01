@@ -8,19 +8,15 @@ export default function orderRepositoryMongoDB() {
 				if (beginError) {
 					return reject(beginError);
 				}
-				//console.log("order entry",orderEntity.getCustomer())
 				const insertQuery = "INSERT INTO orders (orderNumber, customer_id, totalOrderPrice, orderStatus_id, createdAt) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
 				const orderProducts = orderEntity.getOrderProductsDescription().map(product => [product.productId, product.productQuantity]);
-	
 				// Insert order details
 				db.query(insertQuery, [orderEntity.getOrderNumber(), orderEntity.getCustomer(), orderEntity.getTotalOrderPrice(), orderEntity.getOrderStatus()], (error, result) => {
 					if (error) {
 						// Rollback the transaction if there is an error
 						return db.rollback(() => reject(error));
 					}
-	
 					const orderId = result.insertId;
-	
 					// Insert order products
 					const insertProductQuery = "INSERT INTO orderProductsdescription (orderId, productId, productQuantity) VALUES ?";
 					db.query(insertProductQuery, [orderProducts.map(product => [orderId, ...product])], (productError) => {
@@ -28,16 +24,12 @@ export default function orderRepositoryMongoDB() {
 							// Rollback the transaction if there is an error
 							return db.rollback(() => reject(productError));
 						}
-	
 						// Commit the transaction and close the connection
 						db.commit((commitError) => {
 							if (commitError) {
 								// Rollback the transaction if there is an error during commit
 								return db.rollback(() => reject(commitError));
 							}
-	
-	
-							// Resolve with the order details
 							resolve({ orderId, ...orderEntity });
 						});
 					});
@@ -45,31 +37,26 @@ export default function orderRepositoryMongoDB() {
 			});
 		});
 	};
-	/*const findAll = (params) => OrderModel.find().populate('orderStatus').populate('customer');*/
-	//const findAll = (params) => StatusModel.find();
+
 	const findAll = async (params) => {
 		return new Promise((resolve, reject) => {
-
 			// Begin transaction
 			db.beginTransaction((beginError) => {
 				if (beginError) {
 					return reject(beginError);
 				}
-	
 				const select = "SELECT * FROM orders order by 1 asc";
 				db.query(select, (queryError, result) => {
 					if (queryError) {
 						// Rollback the transaction if there is an error
 						return db.rollback(() => reject(queryError));
 					}
-	
 					// Commit the transaction and close the connection
 					db.commit((commitError) => {
 						if (commitError) {
 							// Rollback the transaction if there is an error during commit
 							return db.rollback(() => reject(commitError));
 						}
-	
 						// Resolve with the query result
 						resolve(result);
 					});
@@ -78,7 +65,6 @@ export default function orderRepositoryMongoDB() {
 		});
 	};
     
-	//const findById = (id) => OrderModel.findById(id).populate('orderStatus').populate('customer');
 	const findById = (id) => {
 		return new Promise((resolve, reject) => {
 			// Begin transaction
@@ -109,7 +95,6 @@ export default function orderRepositoryMongoDB() {
 		});
 	};
 
-	//const deleteById = (id) => OrderModel.findByIdAndRemove(id);
 	const deleteById = (id) => {
 		return new Promise((resolve, reject) => {
 			// Begin transaction

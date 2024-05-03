@@ -22,10 +22,11 @@ export default function categoryController() {
   const fetchCategoryById = (req, res, next) => {
     useCaseFindById(req.params.id)
       .then((category) => {
-        if (!category) {
-          res.json(`No category found with id: ${req.params.id}`);
+        console.log(category.length);
+        if (!category || category.length === 0) {
+          res.status(400).json(`No category found with id: ${req.params.id}`);
         }
-        res.json(category);
+        res.status(200).json(category);
       })
       .catch((error) => next(error));
   };
@@ -39,8 +40,7 @@ export default function categoryController() {
         res.json(category);
       })
       //.catch((error) => res.status(400).json(next(`${error.message} - Category list failed`)));
-      //.catch((error) => next(error));
-      .catch((error) => res.json('Falha'));
+      .catch((error) => next(error));
   };
 
   const deleteCategoryById = (req, res, next) => {
@@ -73,18 +73,19 @@ export default function categoryController() {
       /*.then((message) => (
         res.json(message)))
       .catch((error) => next(error));*/
-      .then((message) => {
+      .then((message) => { 
         const resultado = message.rowUpdate;
         if (resultado === 0) {
-            res.status(204).json(message);
+            res.status(400).json('No category found');
         }
     })
     .then((message) => {
         // Send response
         res.status(200).json(message);
     })
+    .catch((error) => next(error));
     //.catch(next); // Pass any errors to the error handling middleware
-    .catch((error) => res.status(400).json(next(`${error.message} - Category updated failed`)));
+    //.catch((error) => res.json(next(`${error.message} - Category updated failed`)));
   };
   
   return {

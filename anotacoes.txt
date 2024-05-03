@@ -1,0 +1,14 @@
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status#mensagens_de_redirecionamento
+
+Respostas Informativas (100 – 199)
+Respostas bem-sucedidas (200 – 299)
+Mensagens de redirecionamento (300 – 399)
+Respostas de erro do cliente (400 – 499)
+Respostas de erro do servidor (500 – 599)
+
+200 (OK), requisição atendida com sucesso;
+201 (CREATED), objeto ou recurso criado com sucesso;
+204 (NO CONTENT), objeto ou recurso deletado com sucesso;
+400 (BAD REQUEST), ocorreu algum erro na requisição (podem existir inumeras causas);
+404 (NOT FOUND), rota ou coleção não encontrada;
+500 (INTERNAL SERVER ERROR), ocorreu algum erro no servidor.

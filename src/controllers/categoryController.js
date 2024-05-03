@@ -7,7 +7,6 @@ import useCaseUpdateById from '../use_cases/category/updateById.js';
 export default function categoryController() {
   
 	const addNewCategory = (req, res, next) => {
-		console.log('controller category');
     const { categoryName, description } = req.body;
 
     useCaseCreate(
@@ -16,8 +15,8 @@ export default function categoryController() {
       Date(),
       Date()
     )
-    .then((category) => res.json(category))
-    .catch((error) => res.json(next(`${error.message} - Category creation failed`)));
+    .then((category) => res.status(201).json(category))
+    .catch((error) => res.status(400).json(next(`${error.message} - Category creation failed`)));
   };
 
   const fetchCategoryById = (req, res, next) => {
@@ -39,7 +38,9 @@ export default function categoryController() {
         }
         res.json(category);
       })
-      .catch((error) => next(error));
+      //.catch((error) => res.status(400).json(next(`${error.message} - Category list failed`)));
+      //.catch((error) => next(error));
+      .catch((error) => res.json('Falha'));
   };
 
   const deleteCategoryById = (req, res, next) => {
@@ -49,15 +50,15 @@ export default function categoryController() {
       .then((message) => {
         const resultado = message.rowUpdate;
         if (resultado === 0) {
-            // If rowupdate is 0, reject the promise with status code 401
-            res.status(203).json(message);
+            res.status(400).json(message);
         }
     })
     .then((message) => {
         // Send response
-        res.status(200).json(message);
+        res.status(204).json(message);
     })
-    .catch(next); // Pass any errors to the error handling middleware
+    //.catch(next); // Pass any errors to the error handling middleware
+    .catch((error) => res.status(400).json(next(`${error.message} - Category delete failed`)));
   };
   
   const updateCategoryById = (req, res, next) => {
@@ -75,15 +76,15 @@ export default function categoryController() {
       .then((message) => {
         const resultado = message.rowUpdate;
         if (resultado === 0) {
-            // If rowupdate is 0, reject the promise with status code 401
-            res.status(203).json(message);
+            res.status(204).json(message);
         }
     })
     .then((message) => {
         // Send response
         res.status(200).json(message);
     })
-    .catch(next); // Pass any errors to the error handling middleware
+    //.catch(next); // Pass any errors to the error handling middleware
+    .catch((error) => res.status(400).json(next(`${error.message} - Category updated failed`)));
   };
   
   return {

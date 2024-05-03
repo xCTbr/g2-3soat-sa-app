@@ -122,6 +122,12 @@ export default function categoryRepositoryMySqlDB() {
 							// Rollback the transaction if there is an error during commit
 							return db.rollback(() => reject(commitError));
 						}
+						const rowUpdate = result.affectedRows;
+						
+						if (rowUpdate === 0) {
+							let retorno = "Category not found";
+							return resolve({ retorno, rowUpdate });		
+						}
 						// Resolve with the query result
 						resolve(result);
 					});
@@ -182,7 +188,7 @@ export default function categoryRepositoryMySqlDB() {
 	
 						if (rowUpdate === 0) {
 							retorno = "Category not found";
-							return resolve({ retorno, rowUpdate });
+							return resolve({ retorno, rowUpdate });		
 						}
 	
 						return resolve({ response: retorno, rowUpdate, Category: nameCategory, Description: description });

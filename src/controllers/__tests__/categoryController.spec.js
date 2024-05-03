@@ -5,7 +5,6 @@ import useCaseFindById from '../../use_cases/category/findById.js';
 import useCasedelete from '../../use_cases/category/deleteById.js'
 import CategoryGateway from '../../application/categoryGateway.js';
 import category from "../../entities/Category.js";
-import updateById from "../../use_cases/category/updateById.js";
 describe("Testes do Category Controller", () => {
 	
 	const objetoCategory = {
@@ -24,14 +23,23 @@ describe("Testes do Category Controller", () => {
 	  });
 
 	// Mock categoryGateway if needed
-	const mockCategory = jest.mock('../../application/categoryGateway.js', () => ({
+	/*jest.mock('../../application/categoryGateway.js', () => ({
 		add: jest.fn(), // Mocking the add method
-		findById: jest.fn(), // Mocking the add method
-		updateById: jest.fn(), // Mocking the add method
+		findById: jest.fn(), // Mocking the findby id
+		updateById: jest.fn(), // Mocking the update by id
 		//findAll: jest.fn() // Mocking the add method
-	}));
+	}));*/
 
-	test('Adicionar nova categoria', async () => {
+	jest.mock("../../application/categoryGateway.js", () => ({
+		__esModule: true,
+		default: {
+		  findById: jest.fn(),
+		  updateById: jest.fn(),
+		},
+	  }));
+	  
+
+	it('Adicionar nova categoria', async () => {
         // Define test data
         const categoryName = 'Test Category';
         const description = 'Test Description';
@@ -45,7 +53,7 @@ describe("Testes do Category Controller", () => {
         expect(CategoryGateway().add).toHaveBeenCalledWith(category(categoryName, description, createdAt, updatedAt));
     });
 
-	test('Busca categoria por id', async () => {
+	it('Busca categoria por id', async () => {
         // Define test data
 		const id = '999';
         
@@ -55,7 +63,7 @@ describe("Testes do Category Controller", () => {
         // Verify that gateway.add is called with the correct parameters
         expect(CategoryGateway().findById).toHaveBeenCalledWith(id);
     });
-	test('Busca todas as categoria', async () => {
+	it('Busca todas as categoria', async () => {
         // Call the function
         await useCasegetAll();
 
@@ -63,7 +71,7 @@ describe("Testes do Category Controller", () => {
         expect(CategoryGateway().findAll).toHaveBeenCalledWith();
     });
 
-	test('Atualiza categoria', async () => {
+	/*test('Atualiza categoria', async () => {
         // Define test data
 		const id = '999';
         const categoryName = 'Test Category';
@@ -74,34 +82,96 @@ describe("Testes do Category Controller", () => {
 		 // Mock the found category
 		 const foundCategory = {
             id: id,
-            categoryName: 'Initial Category',
-            description: 'Initial Description',
-            updatedAt: '2024-04-01'
+            categoryName: categoryName,
+            description: description,
+            updatedAt: updatedAt
         };
 		console.log("resposta");
-
-        //console.log(foundCategory);
-		// Mock categoryGateway.findById to resolve with found category
-		mockCategory.findById.mockResolvedValue(foundCategory);
-			
-		// Mock categoryGateway.updateById
-		mockCategory.updateById.mockResolvedValue(updatedCategory);
-
+		// Mocking findById to resolve with an existing category
+		//CategoryGateway().findById.mockResolvedValue(foundCategory);
         // Call the function
         //await useCaseUpdateById(id, categoryName, description, updatedAt);
 		// Call the function
-		const result = await useCaseUpdateById(id, category(categoryName, description, updatedAt));
+		const result = await useCaseUpdateById(id, categoryName, description, updatedAt);
 
 		// Verify that categoryGateway.findById is called with the correct id
-        expect(CategoryGateway().findById).toHaveBeenCalledWith(id);
+        //expect(CategoryGateway().findById).toHaveBeenCalledWith(id);
 		//useCaseUpdateById
+        // Verify that categoryGateway.updateById is called with the correct id and updated category
+        expect(CategoryGateway().updateById).toHaveBeenCalledWith(id, updatedCategory);
+		console.log(result);
+		// Verify the result
+        expect(result.response).toEqual("Category updated");
+        // Verify that gateway.add is called with the correct parameters
+        //expect(CategoryGateway().updateById).toHaveBeenCalledWith(id,category(categoryName, description, updatedAt));
+    });*/
+	it('Atualiza categoria pendente de valores', async () => {
+        // Define test data
+		const id = '999';
+        const categoryName = '';
+        const description = '';
+        const updatedAt = '2024-05-01';
+		//const updatedCategory = category(categoryName, description, updatedAt);
+
+		const result = await useCaseUpdateById(id, categoryName, description, updatedAt);
+        // Verify that categoryGateway.updateById is called with the correct id and updated category
+        //expect(CategoryGateway().updateById).toHaveBeenCalledWith(id, updatedCategory);
+		
+		// Verify the result
+        expect(result).toEqual("Category name and Description fields are mandatory");
+        // Verify that gateway.add is called with the correct parameters
+        //expect(CategoryGateway().updateById).toHaveBeenCalledWith(id,category(categoryName, description, updatedAt));
+    });
+	/*test('Atualiza categoria id nao encontrado', async () => {
+        // Define test data
+		const id = '00';
+        const categoryName = '';
+        const description = 'Test Description';
+        const updatedAt = '2024-05-01';
+		const updatedCategory = category(categoryName, description, updatedAt);
+
+		const result = await useCaseUpdateById(id, categoryName, description, updatedAt);
         // Verify that categoryGateway.updateById is called with the correct id and updated category
         expect(CategoryGateway().updateById).toHaveBeenCalledWith(id, updatedCategory);
 		
 		// Verify the result
         expect(result).toEqual(updatedCategory);
-        // Verify that gateway.add is called with the correct parameters
-        //expect(CategoryGateway().updateById).toHaveBeenCalledWith(id,category(categoryName, description, updatedAt));
-    });
+        
+    });*/
+
 	
+	it("Atualiza categoria", async () => {	  
+		const id = "999";
+		const categoryName = "Updated Category";
+		const description = "Updated description";
+		const updatedAt = "2024-05-01";
+	  
+		const updatedCategory = {
+		categoryName: categoryName,
+		description: description,
+		updatedAt: updatedAt
+		};
+	  
+		// Mocking findById to resolve with an existing category
+		//jest.spyOn(CategoryGateway(), "findById").mockResolvedValue(existingCategory);
+		//jest.spyOn(CategoryGateway(), "updateById").mockResolvedValue(existingCategory);
+		// Call the function being tested
+		await useCaseUpdateById(id, categoryName, description, updatedAt);
+	
+		// Assertions
+		expect(CategoryGateway().updateById).toHaveBeenCalledWith(id,updatedCategory);
+		// Add expectations for the updated category object if needed
+		  
+	});
+	it("Deleta categoria", async () => {	  
+		const id = "999";
+		
+		await useCasedelete(id);
+	
+		// Assertions
+		expect(CategoryGateway().deleteById).toHaveBeenCalledWith(id);
+		// Add expectations for the updated category object if needed
+		  
+	});
+	  
 });

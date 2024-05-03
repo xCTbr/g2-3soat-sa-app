@@ -3,7 +3,7 @@ import categoryGateway from "../../application/categoryGateway.js";
 
 const gateway = categoryGateway();
 
-export default function updateById(
+export default function updateCategoryById(
     id,
     categoryName,
     description,
@@ -20,11 +20,13 @@ export default function updateById(
     updatedAt
   );
 
-  return gateway.findById(id).then((foundCategory) => {
+  return gateway.updateById(id, updatedCategory);
+
+  /*return gateway.findById(id).then((foundCategory) => {
     if (!foundCategory) {
       //throw new Error(`No customer found with id: ${id}`);
       return Promise.resolve(`No category found with id: ${id}`);
     }
     return gateway.updateById(id, updatedCategory);
-  });
+  });*/
 }

@@ -44,8 +44,20 @@ export default function categoryController() {
 
   const deleteCategoryById = (req, res, next) => {
     useCasedelete(req.params.id)
-      .then(() => res.json('Category sucessfully deleted!'))
-      .catch((error) => next(error));
+      /*.then(() => res.json('Category sucessfully deleted!'))
+      .catch((error) => next(error));*/
+      .then((message) => {
+        const resultado = message.rowUpdate;
+        if (resultado === 0) {
+            // If rowupdate is 0, reject the promise with status code 401
+            res.status(203).json(message);
+        }
+    })
+    .then((message) => {
+        // Send response
+        res.status(200).json(message);
+    })
+    .catch(next); // Pass any errors to the error handling middleware
   };
   
   const updateCategoryById = (req, res, next) => {
@@ -57,9 +69,21 @@ export default function categoryController() {
       description,
       Date()
     )
-      .then((message) => res.json(message))
-      .catch((error) => next(error));
-      
+      /*.then((message) => (
+        res.json(message)))
+      .catch((error) => next(error));*/
+      .then((message) => {
+        const resultado = message.rowUpdate;
+        if (resultado === 0) {
+            // If rowupdate is 0, reject the promise with status code 401
+            res.status(203).json(message);
+        }
+    })
+    .then((message) => {
+        // Send response
+        res.status(200).json(message);
+    })
+    .catch(next); // Pass any errors to the error handling middleware
   };
   
   return {

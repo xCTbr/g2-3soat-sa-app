@@ -20,20 +20,25 @@ describe('orderRepositoryMongoDB', () => {
 		beforeEach(() => {
 			jest.clearAllMocks();
 		});
-		const orderEntity = {
-			getOrderNumber: jest.fn().mockReturnValue('123'),
-			getCustomer: jest.fn().mockReturnValue('customer_id'),
-			getTotalOrderPrice: jest.fn().mockReturnValue(100),
-			getOrderStatus: jest.fn().mockReturnValue('order_status_id'),
-			getOrderProductsDescription: jest.fn().mockReturnValue([{ productId: 1, productQuantity: 2 }])
+
+		const order = {
+			getOrderNumber: jest.fn(() => '123'),
+			getCustomer: jest.fn(() => 'customer_id'),
+			getTotalOrderPrice: jest.fn(() => 100),
+			getOrderStatus: jest.fn(() => 1),
+			getOrderProductsDescription: jest.fn(() => [
+				{ productId: 'product1', productQuantity: 2 },
+				{ productId: 'product2', productQuantity: 1 }
+			])
 		};
+		
 		it('should add a new order to the database', async () => {
 			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback());
 			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(null, { insertId: 1 }));
 			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(null));
 			connectDatabaseMySql.commit.mockImplementation((callback) => callback());
 
-			const result = await orderRepositoryMongoDB().add(orderEntity);
+			await orderRepositoryMongoDB().add(order);
 
 			expect(connectDatabaseMySql.query).toHaveBeenCalledTimes(2);
 			expect(connectDatabaseMySql.commit).toHaveBeenCalled();
@@ -43,65 +48,80 @@ describe('orderRepositoryMongoDB', () => {
 			const beginError = new Error('Transaction Error');
 			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback(beginError));
 
-			await expect(orderRepositoryMongoDB().add(orderEntity)).rejects.toThrow(beginError);
+			await expect(orderRepositoryMongoDB().add(order)).rejects.toThrow(beginError);
 		});
 
 		it('should rollback the transaction if there is an error on insertQuery', async () => {
-			const error = new Error('Error');
+			const order = {
+				getOrderNumber: jest.fn(() => '123'),
+				getCustomer: jest.fn(() => 'customer_id'),
+				getTotalOrderPrice: jest.fn(() => 100),
+				getOrderStatus: jest.fn(() => 1),
+				getOrderProductsDescription: jest.fn(() => [
+					{ productId: 'product1', productQuantity: 2 },
+					{ productId: 'product2', productQuantity: 1 }
+				])
+			};
 
-			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback());
-			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(error));
-			connectDatabaseMySql.rollback.mockImplementationOnce(callback => {
-				callback(null); // Rollback succeeded
+			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback(null));
+			connectDatabaseMySql.query.mockImplementation((query, values, callback) => {
+				if (query.includes('INSERT INTO orders')) {
+					callback(null, { insertId: 1 });
+				} else if (query.includes('INSERT INTO orderProductsdescription')) {
+					callback(new Error('Product insertion error'));
+				}
 			});
-			
-			let errorResult;
-			try {
-				await orderRepositoryMongoDB().add(orderEntity);
-			} catch (error) {
-				errorResult = error;
-			}
-			expect(errorResult).toBeInstanceOf(Error);
-			expect(connectDatabaseMySql.rollback).toHaveBeenCalled();
+			connectDatabaseMySql.rollback.mockImplementation((callback) => callback(null));
+
+			await expect(orderRepositoryMongoDB().add(order)).rejects.toThrow('Product insertion error');
 		});
 
 		it('should rollback the transaction if there is an error on insertProductQuery', async () => {
-			const error = new Error('Error');
-			const productError = new Error('Product Error');
+			const order = {
+				getOrderNumber: jest.fn(() => '123'),
+				getCustomer: jest.fn(() => 'customer_id'),
+				getTotalOrderPrice: jest.fn(() => 100),
+				getOrderStatus: jest.fn(() => 1),
+				getOrderProductsDescription: jest.fn(() => [
+					{ productId: 'product1', productQuantity: 2 },
+					{ productId: 'product2', productQuantity: 1 }
+				])
+			};
 
-			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback());
-			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(null, { insertId: 1 }));
-			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(productError));
-			connectDatabaseMySql.rollback.mockImplementationOnce(callback => callback(error));
-			
-			let errorResult;
-			try {
-				await orderRepositoryMongoDB().add(orderEntity);
-			} catch (error) {
-				errorResult = error;
-			}
-			expect(errorResult).toBeInstanceOf(Error);
-			expect(connectDatabaseMySql.rollback).toHaveBeenCalled();
+			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback(null));
+			connectDatabaseMySql.query.mockImplementation((query, values, callback) => {
+				if (query.includes('INSERT INTO orders')) {
+					callback(new Error('Order insertion error'));
+				}
+			});
+			connectDatabaseMySql.rollback.mockImplementation((callback) => callback(null));
+			await expect(orderRepositoryMongoDB().add(order)).rejects.toThrow('Order insertion error');
 		});
 
 		it('should rollback the transaction if there is an commitError', async () => {
-			const error = new Error('Error');
+			const order = {
+				getOrderNumber: jest.fn(() => '123'),
+				getCustomer: jest.fn(() => 'customer_id'),
+				getTotalOrderPrice: jest.fn(() => 100),
+				getOrderStatus: jest.fn(() => 1),
+				getOrderProductsDescription: jest.fn(() => [
+					{ productId: 'product1', productQuantity: 2 },
+					{ productId: 'product2', productQuantity: 1 }
+				])
+			};
 
-			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback());
-			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(null, {}));
-			connectDatabaseMySql.query.mockImplementationOnce((query, values, callback) => callback(null));
-			connectDatabaseMySql.commit.mockImplementationOnce((callback) => callback(error));
-			// connectDatabaseMySql.rollback.mockImplementationOnce(callback => callback(error));
-
-			let errorResult;
-			try {
-				await orderRepositoryMongoDB().add(orderEntity);
-			} catch (error) {
-				errorResult = error;
-			}
-
-			expect(errorResult).toBeInstanceOf(Error);
-			expect(connectDatabaseMySql.rollback).toHaveBeenCalled();
+			connectDatabaseMySql.beginTransaction.mockImplementation((callback) => callback(null));
+			connectDatabaseMySql.query.mockImplementation((query, values, callback) => {
+				if (query.includes('INSERT INTO orders')) {
+					callback(null, { insertId: 1 });
+				} else if (query.includes('INSERT INTO orderProductsdescription')) {
+					callback(null);
+				}
+			});
+			connectDatabaseMySql.commit.mockImplementation((callback) => callback(new Error('Commit error')));
+			connectDatabaseMySql.rollback.mockImplementation((callback) => callback(null));
+	
+			await expect(orderRepositoryMongoDB().add(order)).rejects.toThrow('Commit error');
 		});
 	});
 

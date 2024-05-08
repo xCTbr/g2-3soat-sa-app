@@ -57,22 +57,29 @@ export default function categoryController() {
       .catch((error) => next(error));
   };
 
-  const deleteCategoryById = (req, res, next) => {
-    useCasedelete(req.params.id)
+  const deleteCategoryById = async (req, res, next) => {
+    try{
+   await useCasedelete(req.params.id)
       /*.then(() => res.json('Category sucessfully deleted!'))
       .catch((error) => next(error));*/
       .then((message) => {
         const resultado = message.rowUpdate;
         if (resultado === 0) {
-            res.status(400).json(message);
+            res.status(400).json('No category found');
+        }else{
+          res.status(204).json('Category deleted');
         }
     })
-    .then((message) => {
+    /*.then((message) => {
         // Send response
         res.status(204).json(message);
-    })
+    })*/
     //.catch(next); // Pass any errors to the error handling middleware
-    .catch((error) => res.status(400).json(next(`${error.message} - Category delete failed`)));
+    //.catch((error) => res.status(400).json(next(`${error.message} - Category delete failed`)));
+    }catch(error){
+      res.status(400).json(error.message);
+      next(error);
+    }
   };
   
   const updateCategoryById  = async (req, res, next) => {

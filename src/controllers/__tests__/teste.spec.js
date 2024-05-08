@@ -147,7 +147,6 @@ describe('Category Controller', () => {
     expect(res.json).toHaveBeenCalledWith(errorMessage);
     //expect(next).not.toHaveBeenCalled();
   });
-  });
 
   // Test case for updateCategoryById
   it('updateCategoryById should update a category by ID', async () => {
@@ -186,5 +185,80 @@ describe('Category Controller', () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith('No category found'); // expect.any(Object)Assuming you're returning a success message
   });
+  });
+
+  describe('Delete Category', () => {
+  
+    it('should handle error during delete category', async () => {
+      // Mock request body
+      const req = {
+        params:{
+          id:1,
+        },
+        body: {
+            categoryName: 'Test Category', // This could trigger an error in your use case
+            description: 'Test Description'
+        },
+        
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(), // Mocking res.status to return itself for chaining
+        json: jest.fn()
+      };
+      const next = jest.fn();
+      // Mock useCaseCreate function to throw an error
+      const errorMessage = 'Category delete failed';
+      useCasedelete.mockRejectedValueOnce(new Error(errorMessage));
+      // Call controller function
+      await categoryController().deleteCategoryById(req, res, next);
+  
+      // Assertions
+      expect(useCasedelete).toHaveBeenCalledTimes(1);
+      
+      expect(res.status).toHaveBeenCalledWith(400);
+  
+      expect(res.json).toHaveBeenCalledWith(errorMessage);
+      //expect(next).not.toHaveBeenCalled();
+    });
+  
+    // Test case for updateCategoryById
+    it('should delete a category by ID', async () => {
+      const req = { params: { id: '1' }, body: { categoryName: 'Delete Category', description: 'Delete Description' } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+      const next = jest.fn();
+      const objetoCategory = {
+        id: '1',
+        categoryName: 'CDC',
+        description: 'Sao Paulo',
+        createdAt: '2024-01-01 00:00',
+        updatedAt: '2024-01-01 00:00',
+        };	
+      useCasedelete.mockResolvedValueOnce(objetoCategory);
+      await categoryController().deleteCategoryById(req, res, next);
+      expect(useCasedelete).toHaveBeenCalledTimes(1);
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.json).toHaveBeenCalledWith('Category deleted'); // expect.any(Object)Assuming you're returning a success message
+    });
+  
+    // Test case for updateCategoryById
+    it('should return category not found', async () => {
+      const req = { params: { id: '1' }, body: { categoryName: 'Delete Category', description: 'Delete Description' } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+      const next = jest.fn();
+      const objetoCategory = {
+        id: '2',
+        categoryName: 'CDC',
+        description: 'Sao Paulo',
+        createdAt: '2024-01-01 00:00',
+        updatedAt: '2024-01-01 00:00',
+        };	
+      useCasedelete.mockResolvedValueOnce({ rowUpdate: 0 });
+      await categoryController().deleteCategoryById(req, res, next);
+      expect(useCasedelete).toHaveBeenCalledTimes(1);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith('No category found'); // expect.any(Object)Assuming you're returning a success message
+    });
+    });
+  
 
 });

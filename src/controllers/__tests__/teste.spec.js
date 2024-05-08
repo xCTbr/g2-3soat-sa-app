@@ -236,7 +236,7 @@ describe('Category Controller', () => {
       useCasedelete.mockResolvedValueOnce(objetoCategory);
       await categoryController().deleteCategoryById(req, res, next);
       expect(useCasedelete).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith('Category deleted'); // expect.any(Object)Assuming you're returning a success message
     });
   
@@ -260,5 +260,128 @@ describe('Category Controller', () => {
     });
     });
   
-
+  describe('Find Category by ID', () => {
+  
+      it('should handle error during find category', async () => {
+        // Mock request body
+        const req = {
+          params:{
+            id:1,
+          },         
+        };
+        const res = {
+          status: jest.fn().mockReturnThis(), // Mocking res.status to return itself for chaining
+          json: jest.fn()
+        };
+        const next = jest.fn();
+        // Mock useCaseCreate function to throw an error
+        const errorMessage = 'Category Find failed';
+        useCaseFindById.mockRejectedValueOnce(new Error(errorMessage));
+        // Call controller function
+        await categoryController().fetchCategoryById(req, res, next);
+    
+        // Assertions
+        expect(useCaseFindById).toHaveBeenCalledTimes(1);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+    
+        expect(res.json).toHaveBeenCalledWith(errorMessage);
+        //expect(next).not.toHaveBeenCalled();
+      });
+    
+      // Test case for findCategoryById
+      it('should find a category by ID', async () => {
+        const req = { params: { id: '1' } };
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+        const next = jest.fn();
+        const objetoCategory = {
+          id: '1',
+          categoryName: 'CDC',
+          description: 'Sao Paulo',
+          createdAt: '2024-01-01 00:00',
+          updatedAt: '2024-01-01 00:00',
+          };	
+        useCaseFindById.mockResolvedValueOnce(objetoCategory);
+        await categoryController().fetchCategoryById(req, res, next);
+        expect(useCaseFindById).toHaveBeenCalledTimes(1);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(objetoCategory); // expect.any(Object)Assuming you're returning a success message
+      });
+    
+      // Test case for findCategoryById
+      it('should return category not found', async () => {
+        const req = { params: { id: '1' }};
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+        const next = jest.fn();
+        const objetoCategory = null;
+        useCaseFindById.mockResolvedValueOnce(objetoCategory);
+        await categoryController().fetchCategoryById(req, res, next);
+        expect(useCaseFindById).toHaveBeenCalledTimes(1);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith('No category found'); // expect.any(Object)Assuming you're returning a success message
+      });
+    });
+  describe('Find All Category', () => {
+      it('should handle error during getAll category', async () => {
+        // Mock request body
+        const req = {
+          params:{
+            id:1,
+          },         
+        };
+        const res = {
+          status: jest.fn().mockReturnThis(), // Mocking res.status to return itself for chaining
+          json: jest.fn()
+        };
+        const next = jest.fn();
+        // Mock useCaseCreate function to throw an error
+        const errorMessage = 'Category get all failed';
+        useCasegetAll.mockRejectedValueOnce(new Error(errorMessage));
+        // Call controller function
+        await categoryController().fetchAllCategory(req, res, next);
+    
+        // Assertions
+        expect(useCasegetAll).toHaveBeenCalledTimes(1);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+    
+        expect(res.json).toHaveBeenCalledWith(errorMessage);
+        //expect(next).not.toHaveBeenCalled();
+      });
+      //Test case for get All
+      it('fetchAllCategory should fetch all categories', async () => {
+        const req = {};
+        const next = jest.fn();
+        const objetoCategory = [{
+          categoryName: 'CDC',
+          description: 'Sao Paulo',
+          createdAt: '2024-01-01 00:00',
+          updatedAt: '2024-01-01 00:00',
+          },{categoryName: 'CDC',
+          description: 'Sao Paulo',
+          createdAt: '2024-01-01 00:00',
+          updatedAt: '2024-01-01 00:00',
+          }];	
+          //const categorydata = new category(objetoCategory);
+        const res = { status: jest.fn().mockReturnThis(),
+          json: jest.fn().mockReturnThis()
+          };
+        useCasegetAll.mockResolvedValueOnce(objetoCategory);
+        await categoryController().fetchAllCategory(req, res, next);
+        expect(useCasegetAll).toHaveBeenCalledTimes(1);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Array)); // Assuming you're returning an array of categories
+      });
+      //Test case for get All
+      it('should return category not found get All', async () => {
+        const req = { params: { id: '1' }};
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+        const next = jest.fn();
+        const objetoCategory = null;
+        useCasegetAll.mockResolvedValueOnce(objetoCategory);
+        await categoryController().fetchAllCategory(req, res, next);
+        expect(useCasegetAll).toHaveBeenCalledTimes(1);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith('No category found'); // expect.any(Object)Assuming you're returning a success message
+      });
+  });
 });

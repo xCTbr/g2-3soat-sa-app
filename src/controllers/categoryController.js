@@ -33,28 +33,38 @@ export default function categoryController() {
     });*/
   };
 
-  const fetchCategoryById = (req, res, next) => {
-    useCaseFindById(req.params.id)
+  const fetchCategoryById = async (req, res, next) => {
+    try{
+    await useCaseFindById(req.params.id)
       .then((category) => {
-        console.log(category.length);
+       
         if (!category || category.length === 0) {
-          res.status(400).json(`No category found with id: ${req.params.id}`);
+          res.status(400).json('No category found');
+        }else{
+          res.status(200).json(category);
         }
-        res.status(200).json(category);
-      })
-      .catch((error) => next(error));
+        
+      });}catch(error){
+        res.status(400).json(error.message);
+        next(error);
+      }
+      //.catch((error) => next(error));
   };
 
   const fetchAllCategory = async (req, res, next) => {
-    useCasegetAll()
+  try{
+   await useCasegetAll()
       .then((category) => {
         if (!category) {
           res.status(400).json(`No category found`);
         }
         res.status(200).json(category);
-      })
+      })}catch(error){
+        res.status(400).json(error.message);
+        next(error);
+      }
       //.catch((error) => res.status(400).json(next(`${error.message} - Category list failed`)));
-      .catch((error) => next(error));
+      //.catch((error) => next(error));
   };
 
   const deleteCategoryById = async (req, res, next) => {
@@ -67,7 +77,7 @@ export default function categoryController() {
         if (resultado === 0) {
             res.status(400).json('No category found');
         }else{
-          res.status(204).json('Category deleted');
+          res.status(200).json('Category deleted');
         }
     })
     /*.then((message) => {

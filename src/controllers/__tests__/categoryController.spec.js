@@ -1,4 +1,4 @@
-import categoryController from '../../controllers/categoryController';
+import categoryController from '../categoryController.js';
 import useCaseCreate from '../../use_cases/category/add.js';
 import useCasegetAll from '../../use_cases/category/getAll.js';
 import useCaseFindById from '../../use_cases/category/findById.js';

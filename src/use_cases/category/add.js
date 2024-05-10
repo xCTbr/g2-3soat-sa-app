@@ -1,7 +1,7 @@
 import category from "../../entities/Category.js";
 import categoryGateway from "../../application/categoryGateway.js";
 
-const gateway = categoryGateway();
+//const gateway = categoryGateway();
 
 export default function createCategory(
     categoryName,
@@ -9,11 +9,9 @@ export default function createCategory(
     createdAt,
     updatedAt
 ){
-		
     if (!categoryName || !description) {
       return Promise.resolve(`Category Name and Description fields cannot be empty`);
     }
-		//const newCategory = category(categoryName, description, createdAt, updatedAt)
-    //return gateway.add(newCategory);
-    return gateway.add(category(categoryName, description, createdAt, updatedAt));
+    
+    return categoryGateway().add(category(categoryName, description, createdAt, updatedAt));
 }

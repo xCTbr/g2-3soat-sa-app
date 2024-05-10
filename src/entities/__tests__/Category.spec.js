@@ -1,4 +1,4 @@
-import Category from "../Category.js";
+import Category from "../../entities/Category.js";
 
 describe("Entity Category", () => {
 	

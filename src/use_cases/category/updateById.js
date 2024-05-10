@@ -1,7 +1,7 @@
 import category from "../../entities/Category.js";
 import categoryGateway from "../../application/categoryGateway.js";
 
-const gateway = categoryGateway();
+//const gateway = categoryGateway();
 
 export default function updateCategoryById(
     id,
@@ -20,7 +20,7 @@ export default function updateCategoryById(
     updatedAt
   );
 
-  return gateway.updateById(id, updatedCategory);
+  return  categoryGateway().updateById(id, updatedCategory);
 
   /*return gateway.findById(id).then((foundCategory) => {
     if (!foundCategory) {

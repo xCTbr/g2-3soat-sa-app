@@ -3,6 +3,7 @@ import createCategory from "../../use_cases/category/add.js";
 import categoryGateway from "../../application/categoryGateway.js";
 import deleteById from "../../use_cases/category/deleteById.js";
 import updateCategoryById from "../../use_cases/category/updateById.js";
+import findCategoryById from "../../use_cases/category/findById.js"
 import category from "../../entities/Category.js";
 
 jest.mock("../../application/categoryGateway.js");
@@ -99,6 +100,19 @@ describe("Use Case Category", () => {
 
     deleteById(id);
     expect(categoryGateway().deleteById).toHaveBeenCalledWith(id);
+  });
+
+  it("should call find with the id", () => {
+    const id = 1;
+    
+    const mockCategory = { /* mock category object */ };
+    //categoryGateway.mockReturnValue({ deleteById: mockAdd });
+    // Mock categoryGateway.add method
+    const mockFindById = jest.fn();
+    categoryGateway.mockReturnValue({ findById: mockFindById });
+
+    findCategoryById(id);
+    expect(categoryGateway().findById).toHaveBeenCalledWith(id);
   });
 
 });

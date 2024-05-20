@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/app:latest
+          image: 767397818445.dkr.ecr.us-east-1.amazonaws.com/app:latest
           ports:
             - containerPort: 80
           resources:

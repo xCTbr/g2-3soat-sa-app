@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: carlostofoli/tech-challenge-fase3:latest
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/app:latest
           ports:
             - containerPort: 3000
           env:
